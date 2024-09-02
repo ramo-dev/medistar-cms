@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Image from "next/image"
 import { Loader } from "lucide-react";
-
+import { useRouter } from "next/navigation";
 import useLogin from "../utils/hooks/useLogin";
 import { toast } from "sonner";
 
@@ -25,7 +25,8 @@ export default function Page() {
     password: ""
   });
 
-  const { user, login, loading, error } = useLogin();
+  const { success, login, loading, error } = useLogin();
+  const router = useRouter();
 
 
   const handleChange = (e) => {
@@ -33,23 +34,27 @@ export default function Page() {
   }
 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(loginForm.email, loginForm.password);
-    if (user) {
-      toast.success("Login successful!")
-    } else {
-      toast.error(error)
-    }
+    await login(loginForm);
   };
 
+  useEffect(() => {
+    error && toast.error(error);
+    if (success) {
+      toast.success("Login successful!");
+      setTimeout(() => {
+        router.push("/dashboard")
+      }, 1000)
+
+    }
+  }, [error, success])
 
 
   return (
     <div className="relative h-screen object-cover py-20 bg-primary/20  bg-[url('/images/login.jpg')] bg-cover bg-center">
       <div className="absolute inset-0 bg-black/20" aria-hidden="true" />
       <Card className="relative mx-auto max-w-sm bg-opacity-50">
-        {user && user.email}
         <CardHeader>
           <Link href="/">
             <CardTitle className="text-2xl">

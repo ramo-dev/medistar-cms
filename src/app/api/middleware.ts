@@ -2,6 +2,13 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error("Please define the JWT_SECRET environment variable inside .env.local");
+}
+
+
 export function middleware(request: Request) {
   const authHeader = request.headers.get("authorization");
   const token = authHeader && authHeader.split(" ")[1];
@@ -13,7 +20,8 @@ export function middleware(request: Request) {
 
   try {
     //verifying if token is valid
-    const user = jwt.verify(token, process.env.JWT_SECRET);
+    const user = jwt.verify(token, JWT_SECRET);
+    console.log(user);
     // Attaching user to request is not directly supported in middleware,
     // For now, i'll allow request to proceed if token is valid.
     return NextResponse.next();

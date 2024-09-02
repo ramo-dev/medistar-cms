@@ -10,15 +10,43 @@ import { Activity, Clipboard, Users, Calendar, Settings, Menu, Search, Building2
 import NewPatient from "./components/newPatient"
 import CalendarPrev from "./components/calendar"
 import GoBackBtn from "./components/goBackBtn"
-
+import useAuthStore from "../utils/store/Authstore"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
+import Loading from "./loading"
 
 
 export default function HMSLayout({ children }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const { user, isAuthenticated, logout } = useAuthStore();
   const router = useRouter();
 
 
+  if (!isAuthenticated) {
+    return (
+      <div className="h-screen flex flex-col justify-center items-center space-y-10">
+        <h1 className="text-5xl font-bold text-center">Error: 401</h1>
+
+        <Image
+          loading="lazy"
+          width={200}
+          height={200}
+          alt="Access Denied"
+          src="/images/assets/AccessDenied.svg"
+        />
+
+        <h1 className="text-3xl font-bold text-center">
+          You are not authorized <br /> to access this page!
+        </h1>
+      </div>
+    );
+  }
+
+
+  function handleLogout() {
+    logout();
+    router.push("/login")
+  }
 
 
   return (
@@ -151,6 +179,7 @@ export default function HMSLayout({ children }) {
               </nav>
             </SheetContent>
           </Sheet>
+          <h1>Hello, {user && user.firstName + " " + user.secondName}</h1>
           <form className="relative ml-auto flex-1 md:max-w-xs">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -183,7 +212,11 @@ export default function HMSLayout({ children }) {
                 <Link href="/dashboard/support">Support</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem className="w-full p-0 cursor-pointer">
+                <Button onClick={handleLogout} variant="destructive" className="m-0 h-8 w-full">
+                  Logout
+                </Button>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>

@@ -25,7 +25,7 @@ const doctorSchema = new mongoose.Schema({
   location: {
     //type: mongoose.Schema.Types.ObjectId,
     // ref: "Location",
-    type: string,
+    type: String,
   },
   admin: {
     type: Boolean,
